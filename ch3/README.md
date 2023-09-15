@@ -126,6 +126,49 @@ suke@klmbox:~/kernels/linux-6.2.16/lib$ find /lib/modules/6.2.16-llkd01/kernel/ 
 suke@klmbox:~$ echo $STG_MYKMODS
 ../staging/rootfs/my_kernel_modules
 ```
+ただ、`/lib`配下のファイルは残しておく．理由はこの後のGRUB bootloaderの節でビルドしたモジュルールをそのまま起動に利用しているから．
+
+# Generating th initramfs image and bootloader config
+Fedoraだとデフォルトではgrubのメニュー設定を変更するためのソフトがなくてコマンドが走らないらしい．Ubuntuはその心配はいらないようなのでそのまま`initramfs`とbootloaderのconfig生成を行う(実際vmにはgrub config系のパッケージが入ってた)．
+```
+suke@klmbox:~/kernels/linux-6.2.16$ sudo make install
+...
+update-initramfs: Generating /boot/initrd.img-6.2.16-llkd01
+...
+Generating grub configuration file ...
+...
+done
+```
+出力の通りinitramfsの生成とgrubのconfigが行われている．
+
+## iniramfs generating process
+本では`make install`のときにコンソール上のメッセージから`intall.sh`が走っているといっている．しかし、手元の環境だとその出力が得られなかった．本と同じパスにある`install.sh`を確認してみると同様のことをしているのでやっぱりこれが走っているっぽい(コメントアウトにも書いてある)．
+
+中身ではビルドされているファイルたちを適当なパスにコピーしているだけである．もし、古いファイルやconfigが存在した場合には`.old`としてファイルを保持する．
+スクリプトの後半では`/sbin/lilo`が呼ばれている．GRUBとは違う古いbootloaderだがそのあとにGRUBのconfigは走っているので多分関係ない．
+```
+suke@klmbox:~/kernels/linux-6.2.16$ la /boot/ | grep llkd01
+System.map-6.2.16-llkd01
+config-6.2.16-llkd01
+initrd.img-6.2.16-llkd01
+vmlinuz-6.2.16-llkd01
+```
+ちゃんとコピーされていて、
+```sh
+suke@klmbox:~/kernels/linux-6.2.16$ md5sum ./arch/x86/boot/bzImage
+8a6d1142297e5c02c409b68e5cf0af92  ./arch/x86/boot/bzImage
+suke@klmbox:~/kernels/linux-6.2.16$ md5sum /boot/vmlinuz-6.2.16-llkd01
+8a6d1142297e5c02c409b68e5cf0af92  /boot/vmlinuz-6.2.16-llkd01
+```
+名前変わってるだけと．
+
+```sh
+suke@klmbox:~/kernels/linux-6.2.16$ ls -la /boot/grub/grub.cfg
+-rw-rw-r-- 1 root root 11804  9月 17 14:27 /boot/grub/grub.cfg
+```
+GRUBのconfigもちゃんと更新されている．
+
+# What's initramfs and initramfs fw
 
 # What's GRUB bootloader
 VM上のGuestOSのマシンでBootloaderと戯れる章？
@@ -142,3 +185,12 @@ VM上のGuestOSのマシンでBootloaderと戯れる章？
       * デバイスドライバ
       * ハードウェアごとに違う．組み込みボードに対するソフトウェアサポートパッケージ
       * だから、BSPはKernelを含む(もっと広範囲をさす言葉)
+* initramfs
+  * initial ram filesystem
+### 役に立たない豆知識
+* vmlinuxとvmlinuz
+  * カーネルイメージ
+  * 昔Unixでカーネルをvmunixと読んでいたから真似たみたい
+  * vmlinuxは圧縮されていないデバッグ情報とかもあるやつ(ビルドによるが)、静的リンク
+  * vmlinuzはbzImageと同様、圧縮されたイメージファイル．
+    * zはgzip圧縮だって言いたいだけらしい
