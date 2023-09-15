@@ -89,13 +89,43 @@ make -j4
 使用率が変わってるのでうまくいってる．足掻くもんだね．
 
 # Installing the kernel modules
-ビルドが通ってないが一応書いてあることに目を通す．
+~~ビルドが通ってないが一応書いてあることに目を通す．~~
+ビルドが通ったので続きをやる．
+ビルドされたモジュールはソースツリーの中にバイナリとして存在している．
 `make menuconfig`でmに設定したやつは`.ko`ファイルとして存在することは上で触れた通り．なので、`vmlinux`や`bzImage`のなかに埋め込まれていない．
 本ではVirtualBox supportなどの項目をモジュールにしたよねということで、それをさがしていた．
 ```
 find . -name "*.ko" -ls | egrep -i "vbox|msdos|uio" | awk '{printf "%-40s %9d\n", $11, $7}'
 ```
-`make`で`INSTALL_MOD_PATH`を指定しておくと任意のパスにモジュルールを置けるみたい．
+ただ、この状態だとkernel起動時に読み込めないので正しい場所にインストールされている必要がある．
+インストール場所は`/lib/modules/$(uname -r)`(バージョンはビルドに使用したやつ)になる．実際に`sudo make modules_install`したあとに確認すると
+```bash
+suke@klmbox:~/kernels/linux-6.2.16/lib$ ls /lib/modules/
+6.2.0-26-generic  6.2.0-32-generic  6.2.16-llkd01
+suke@klmbox:~/kernels/linux-6.2.16/lib$ find /lib/modules/6.2.16-llkd01/kernel/ -name "*.ko" | egrep "vboxguest|msdos|uio"
+/lib/modules/6.2.16-llkd01/kernel/fs/fat/msdos.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/virt/vboxguest/vboxguest.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/comedi/drivers/pcmuio.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_sercos3.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_pdrv_genirq.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_netx.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_hv_generic.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_pruss.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_cif.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_aec.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_dfl.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_dmem_genirq.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_mf624.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio.ko
+/lib/modules/6.2.16-llkd01/kernel/drivers/uio/uio_pci_generic.ko
+```
+で`6.2.16-llkd01`(オプションで指定したローカルバージョン変数が末尾に反映されている)のフォルダ内に配置されている．
+`make modules_install`で`INSTALL_MOD_PATH`を指定しておくと任意のパスにモジュルールを置けるみたい．さっきは`/lib`配下にインストールしていたから`sudo`していたけれど適当なパスを指定すればその必要はなくなる．ホストのカーネルモジュールとかと干渉しないように分けておくと安心かもねと．
+これも本に従っておく
+```
+suke@klmbox:~$ echo $STG_MYKMODS
+../staging/rootfs/my_kernel_modules
+```
 
 # What's GRUB bootloader
 VM上のGuestOSのマシンでBootloaderと戯れる章？
