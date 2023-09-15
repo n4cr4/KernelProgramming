@@ -23,6 +23,7 @@ ch2までを終わらせていないと進められないので注意．
 
 ### うまくいかない1
 **ビルドが通らない！！**
+
 ![what](img/buildfaild.png)
 
 #### 原因
@@ -63,7 +64,9 @@ make -j4
 
 ### うまくいかない2
 **vmの容量がパンクした**
+
 ![what](img/nospace.png)
+
 ![what](img/nospace1.png)
 
 流石に終わったと思った．でもまだ入れる保険がある．vmのディスク拡張はVirtualBoxとGuestOS(Ubuntu)両方で作業が必要．
@@ -82,6 +85,7 @@ make -j4
 `sudo resize2fs /dev/sda3`
 
 ![what](img/nospace2.png)
+
 使用率が変わってるのでうまくいってる．足掻くもんだね．
 
 # Installing the kernel modules
