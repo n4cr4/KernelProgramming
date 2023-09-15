@@ -128,7 +128,7 @@ suke@klmbox:~$ echo $STG_MYKMODS
 ```
 ただ、`/lib`配下のファイルは残しておく．理由はこの後のGRUB bootloaderの節でビルドしたモジュールをそのまま起動に利用しているから．
 
-# Generating th initramfs image and bootloader config
+# Generating the initramfs image and bootloader config
 Fedoraだとデフォルトではgrubのメニュー設定を変更するためのソフトがなくてコマンドが走らないらしい．Ubuntuはその心配はいらないようなのでそのまま`initramfs`とbootloaderのconfig生成を行う(実際vmにはgrub config系のパッケージが入ってた)．
 ```
 suke@klmbox:~/kernels/linux-6.2.16$ sudo make install
