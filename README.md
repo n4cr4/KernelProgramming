@@ -9,3 +9,6 @@
 * [Doc](https://www.kernel.org/doc/html/latest/)
 * [bootlin elixir](https://elixir.bootlin.com/linux/v5.19.17/source)
 
+## 作業ログ、資料
+* [chapter1-2](ch1-2/README.md)
+* [chapter3](ch3/README.md)
