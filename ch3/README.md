@@ -187,7 +187,18 @@ GRUBのconfigもちゃんと更新されている．
 ミニマルなルートファイルシステムとかを構成できるのとユーザスペースの実行環境が作れてしまうのでなんでも屋さんになれる．
 
 # What's GRUB bootloader
-VM上のGuestOSのマシンでBootloaderと戯れる章？
+BootloaderはOSのロードを行う．複数のOSを同じコンピュータにインストールしたときに使い分けるときも活躍する．ブートメニューを表示して、どのOSで起動するか、kernelの選択もできる．このメニューはカスタマイズできる．ブートプロセスは上で触れた通り．この中でBootloaderはkernelとinitramfsのロードを行う．ブートプロセスのデバッグやカスタマイズのためにコマンドラインを提供してくれる．
+
+セキュアブートも触れられたりするが、レイヤ的にはUEFIの設定の話になるためGRUBより低い．
+
+とにかくGRUBはPCに電源が入ってからkernelおよびinitramfsをロードしてエントリポイントに処理を移すまでを担当していることを頭に入れたい．
+
+## Customizing
+
+## Check if it's work
+
+## Security with GRUB
+GRUB経由でのシングルユーザーモード起動の制限についてすこし調査してみる．
 
 ## おまけ
 ### 単語集
@@ -229,6 +240,8 @@ VM上のGuestOSのマシンでBootloaderと戯れる章？
     * ただ、手元のUbuntuではBluetoothのスクリプトとか走ってたからイマイチ
   * 5 = GUI
   * 6 = 再起動
+* GRUB
+  * GRand Unified Bootloader
 ### 役に立たない豆知識
 * vmlinuxとvmlinuz
   * カーネルイメージ
@@ -239,3 +252,7 @@ VM上のGuestOSのマシンでBootloaderと戯れる章？
 * cpio
   * 標準入力からファイルリストを受け取ってアーカイブファイルを作成する
   * `find . -print0 | cpio -o -O hoge.cpio`
+* voilà
+  * フランス語で`ジャジャーンw、でっきあーがりー`です．
+* empirical
+  * 経験的な
