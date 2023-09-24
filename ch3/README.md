@@ -194,8 +194,81 @@ BootloaderはOSのロードを行う．複数のOSを同じコンピュータに
 とにかくGRUBはPCに電源が入ってからkernelおよびinitramfsをロードしてエントリポイントに処理を移すまでを担当していることを頭に入れたい．
 
 ## Customizing
+configのバックアップをとる
+```
+sudo cp /etc/default/grub /etc/default/grub.orig
+```
+configに以下の項目を追加
+* `GRUB_HIDDEN_TIMEOUT_QUIET=false`
+  * プロンプトを常に表示
+* `GRUB_TIMEOUT_STYLE=menu`
+  * 上の項目と同じ意味、OSによってはこちらを選択
+  * Ubuntu22.04ではこっち
+* `GRUB_TIMEOUT=3`
+  * デフォルトのOSが立ち上がるまでの時間
+* `GRUB_HIDDEN_TIMEOUT=1`をコメントアウト
+  * 手元の環境ではなかった
+
+追加し終わったら`sudo update-grub`
+
+立ち上げに用いるkernelのデフォルトを指定する．
+`GRUB_DEFAULT=0`が指定されている(手元ではそもそもこの項目が存在しなかった)．この状態だと一番最後に追加されたカーネルが使用されることになる．
+手元で開発および実験のために用意した`6.2.16-llkd01`がデフォルトで立ち上がるのは少々都合が悪いので変更する．
+`GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 6.2.0-32-generic"`
+文字列で指定されているのはUbuntu22.04で元々使用されているkernelである．
+
+`/etc/default/grub`を変更したら忘れずに`sudo update-grub`をする．
 
 ## Check if it's work
+`sudo reboot`で実際にGRUBの画面に移る．
+タイムアウトを3秒に設定していたはずなので、`Enter`以外を連打しておく(`Enter`は選択している項目で次に進むのでデフォルトから変更できない)．
+`Advanced options for Ubuntu`を選択する．
+![menu](img/grub.png)
+
+デフォルトで先程指定したカーネルが選択されていることが確認できる．また、手元の環境ではバージョンアップの影響で`6.2.0-32`と`6.2.0-33`がある．
+また、それぞれのkernelにはリカバリーモードでの立ち上げオプションがある．
+
+今回は実際に先程ビルドした`6.2.16-llkd01`を起動に使用する．
+
+![boot](img/boot.png)
+
+うまく行ったみたい
+
+## GRUB prompt
+先程は`6.2.16-llkd01`を選択してからすぐに`Enter`を押して起動したが`e`(edit)を押すことでGRUB prompt(GRUB編集画面)に移ることができる．
+![prompt](img/grubprompt.png)
+
+linuxという項目はGRUB bootloaderがkernelに渡す引数の設定を行っているので重要である．
+引数の一部に変更を行うことで編集の効果を確認できる．
+実際に`quiet`と`splash`を引数から削除するとUbuntuのブート画面が表示されずに起動ログがたれ流しになる(Ubuntu serverと同じノリになる)．
+
+また、引数に`single`を指定することでシングルユーザーモードでの起動を可能にする．パスワードを忘れてしまった場合などに使用できる．
+
+linuxの引数に指定できる主な項目は以下の通り
+* root
+  * ルートファイルシステム
+* single
+  * シングルユーザーモード
+* quiet
+  * 起動メッセージを少なくする
+* splash
+  * 起動時にロゴ画面を有効にする(オレンジのあれ)
+* acpi
+  * ACPIを有効にするか否か
+* nomodeset
+  * ビデオドライバのモード設定を無効にする
+* ro
+  * ルートファイルシステムを読み取り専用で
+* rw
+  * ルートファイルシステムを読み書き可能で
+* ipv6.disable
+  * IPv6を無効にする
+* nouveau.modeset
+  * NVIDIAグラフィックカードのNouveauのモード設定について
+* loglevel
+  * カーネルのログレベル
+* mem
+  * カーネルが使用するメモリの制限
 
 ## Security with GRUB
 GRUB経由でのシングルユーザーモード起動の制限についてすこし調査してみる．
