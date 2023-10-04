@@ -270,6 +270,64 @@ linuxの引数に指定できる主な項目は以下の通り
 * mem
   * カーネルが使用するメモリの制限
 
+## Veryfying
+自分でビルドしたカーネルで起動したときに、ビルドの設定(`make menuconfig`をしていたときの話)が正しく反映されているかを確認する．
+
+`CONFIG_IKCONFIG`を有効にしていたので`extract-ikconfig`というスクリプトを介して設定を見ることができた．
+```
+$LLKD_KSRC/scripts/extract-ikconfig /boot/vmlinuz-6.2.16-llkd01
+```
+
+設定がうまく働いている．続いて他の項目も確認する．
+```
+suke@klmbox:~$ $LLKD_KSRC/scripts/extract-ikconfig /boot/vmlinuz-6.2.16-llkd01 | egrep "IKCONFIG|HAMRADIO|PROFILING|VBOXGUEST|UIO|MSDOS_FS|SECURITY|DEBUG_STACK_USAGE"
+CONFIG_IKCONFIG=y
+CONFIG_IKCONFIG_PROC=y
+# CONFIG_PROFILING is not set
+# CONFIG_NFIT_SECURITY_DEBUG is not set
+# CONFIG_HAMRADIO is not set
+CONFIG_UIO=m
+CONFIG_UIO_CIF=m
+CONFIG_UIO_PDRV_GENIRQ=m
+CONFIG_UIO_DMEM_GENIRQ=m
+CONFIG_UIO_AEC=m
+CONFIG_UIO_SERCOS3=m
+CONFIG_UIO_PCI_GENERIC=m
+CONFIG_UIO_NETX=m
+CONFIG_UIO_PRUSS=m
+CONFIG_UIO_MF624=m
+CONFIG_UIO_HV_GENERIC=m
+CONFIG_UIO_DFL=m
+CONFIG_VBOXGUEST=m
+CONFIG_COMEDI_PCMUIO=m
+# CONFIG_NVDIMM_SECURITY_TEST is not set
+CONFIG_EXT4_FS_SECURITY=y
+CONFIG_REISERFS_FS_SECURITY=y
+CONFIG_JFS_SECURITY=y
+CONFIG_F2FS_FS_SECURITY=y
+CONFIG_MSDOS_FS=m
+CONFIG_JFFS2_FS_SECURITY=y
+CONFIG_UBIFS_FS_SECURITY=y
+CONFIG_EROFS_FS_SECURITY=y
+CONFIG_9P_FS_SECURITY=y
+CONFIG_SECURITY_DMESG_RESTRICT=y
+# CONFIG_SECURITY is not set
+CONFIG_SECURITYFS=y
+CONFIG_DEFAULT_SECURITY_DAC=y
+CONFIG_DEBUG_STACK_USAGE=y
+```
+~~`CONFIG_UIO_CIF=m`は話が違う~~
+[設定項目](../ch1-2/README.md#menuconfigでやったこと)も適宜参照しながら確認するといい．
+
+また、`CONFIG_IKCONFIG_PROC`も有効にしていたので、configのアーカイブファイルが見れるはず．
+```
+suke@klmbox:~$ gunzip -c /proc/config.gz | grep "CONFIG_LOCALVERSION"
+CONFIG_LOCALVERSION="-llkd01"
+# CONFIG_LOCALVERSION_AUTO is not set
+```
+
+良い感じに動いてる．
+
 ## Security with GRUB
 GRUB経由でのシングルユーザーモード起動の制限についてすこし調査してみる．
 
