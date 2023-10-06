@@ -17,6 +17,7 @@ passを聞かれずにシングルユーザーモードでの起動をする方�
 5. `init=/bin/bash`を追加(PID=1には`bash`がちゃんとくる)
 
 ![single user](img/singleuser.png)
+
 パスワード認証が回避できた．
 ユーザの追加など行いたい操作が一通り終わったら`exec /sbin/init`で通常のOS起動ができる．
 
@@ -24,6 +25,7 @@ passを聞かれずにシングルユーザーモードでの起動をする方�
 grubのconfigによってシングルユーザーモードでの起動に認証を要求するようにできる．
 
 `grub-mkpasswd-pbkdf2`を実行してパスワードのハッシュを作成する．
+
 ![mkpasswd](img/pbkfd.png)
 
 grub.dのconfigを変更する．
@@ -32,6 +34,7 @@ sudo vim /etc/grub.d/40_custom
 ```
 
 ![config](img/40_custom.png)
+
 コメントアウトの下の行が新しく追加された項目．
 
 設定を変更したら`sudo update-grub`

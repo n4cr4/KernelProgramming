@@ -236,6 +236,7 @@ configに以下の項目を追加
 
 ## GRUB prompt
 先程は`6.2.16-llkd01`を選択してからすぐに`Enter`を押して起動したが`e`(edit)を押すことでGRUB prompt(GRUB編集画面)に移ることができる．
+
 ![prompt](img/grubprompt.png)
 
 linuxという項目はGRUB bootloaderがkernelに渡す引数の設定を行っているので重要である．
