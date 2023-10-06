@@ -38,6 +38,7 @@ sudo vim /etc/grub.d/40_custom
 コメントアウトの下の行が新しく追加された項目．
 
 設定を変更したら`sudo update-grub`
+
 ![auth](img/root.png)
 
 ただ、この設定の場合はOSが立ち上がるときに常に(GRUBが実行されるときに)パスワードを要求するようになる．鬱陶しいかも(GRUBの設定とかtimeoutしても要求が走る)．
