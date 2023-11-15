@@ -1,8 +1,35 @@
 <!-- # Passing parameters to a kernel
 
-# Floating point not allowed in the kernel
+# Floating point not allowed in the kernel -->
 
-# Auto-loading modules on system boot -->
+# Auto-loading modules on system boot
+```
+install:
+  make -C $(KDIR) M=$(PWD) modules_install
+```
+このセクションはMakefile内に記述されるので、`make install`に対応するものである．(rootでないとうまくいかないかも)
+デモ用のMakefileでは`depmod`が内部で呼ばれていて、モジュールの依存関係を解決してくれる．
+
+LKMのオートロードのために`/etc/modules-load.d/<module_name>.conf`を作成する方法がある．また、オートロードの際にLKMに引数を渡したい場合に`/etc/modprobe.d/<module_name>.conf`に以下のような記述をすればよい．
+```
+options <module_name> <param_key>=<val>
+```
+実際に`/etc/modprobe.d/alsa-base.conf`を確認してみると例えば以下のような記述が確認できる．
+```
+options snd-usb-audio index=-2
+options snd-usb-caiaq index=-2
+options snd-usb-ua101 index=-2
+```
+
+LKMがinstallされると`/lib/modules/$(uname -r)/extra/`のような場所にオブジェクトファイルが配置される．
+
+逆にオートロードされたくないLKMが存在する場合、ブラックリストを定義することで実現できる．
+
+## insmod vs modprobe
+modprobeはモジュールの依存関係を考慮して必要とあれば事前に該当のものを含めてロードしてくれる．depファイル等の話とつながるはず．一方insmodは純粋に指定されたモジュールのみをロードする．
+
+## Auto-loading and security ??
+[悪いこと](./autoload.md)ができるか検証する．周辺知識や分析をできるとこまで．
 
 # Kernel modules and security
 ## Proc fs tunables affecting the system log
